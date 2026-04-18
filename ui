@@ -327,15 +327,15 @@ local Library do
     },
 
     ["Roni"] = {
-      ["Background"] = FromRGB(7, 9, 16),
-      ["Inline"] = FromRGB(11, 14, 24),
-      ["Border"] = FromRGB(26, 34, 64),
-      ["Shadow"] = FromRGB(59, 91, 255),
-      ["Text"] = FromRGB(230, 235, 255),
-      ["Inactive Text"] = FromRGB(120, 130, 160),
-      ["Accent"] = FromRGB(91, 123, 255),
-      ["Element"] = FromRGB(15, 19, 32),
-      ["Gradient"] = FromRGB(140, 165, 255)
+      ["Background"] = FromRGB(16, 18, 18),
+      ["Inline"] = FromRGB(21, 24, 24),
+      ["Border"] = FromRGB(30, 34, 34),
+      ["Shadow"] = FromRGB(0, 0, 0),
+      ["Text"] = FromRGB(245, 245, 245),
+      ["Inactive Text"] = FromRGB(140, 145, 150),
+      ["Accent"] = FromRGB(64, 110, 245),
+      ["Element"] = FromRGB(30, 34, 34),
+      ["Gradient"] = FromRGB(200, 210, 230)
     }
   }
 
@@ -859,7 +859,7 @@ local Library do
     DisplayOrder = 999,
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
-    Enabled = IsMobile
+    Enabled = false
   })
   pcall(protect_gui, Library.MobileToggleHolder.Instance)
   if Library.MobileToggleHolder.Instance.Parent == nil then
@@ -4837,7 +4837,7 @@ local Library do
         Name = "\0",
         BorderColor3 = FromRGB(0, 0, 0),
         AnchorPoint = Vector2New(0, 0),
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 0,
         Position = UDim2New(0, Camera.ViewportSize.X / 3.5, 0, Camera.ViewportSize.Y / 3.5),
         Size = Window.Size,
         ClipsDescendants = true,
@@ -5044,6 +5044,7 @@ local Library do
       Items["Cursor"] = Instances:Create("Frame", {
         Parent = Library.Holder.Instance,
         Name = "\0",
+        Visible = false,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 0, 0, 0),
         BorderColor3 = FromRGB(0, 0, 0),
@@ -5055,16 +5056,18 @@ local Library do
       Items["Image"] = Instances:Create("ImageLabel", {
         Parent = Items["Cursor"].Instance,
         Name = "\0",
+        Visible = false,
+        ImageTransparency = 1,
         ImageColor3 = FromRGB(232, 186, 248),
         BorderColor3 = FromRGB(0, 0, 0),
-        Image = "rbxassetid://132511743665753",
+        Image = "",
         BackgroundTransparency = 1,
         Size = UDim2New(0, 16, 0, 16),
         BorderSizePixel = 0,
         ZIndex = 10001,
         Rotation = -90,
         BackgroundColor3 = FromRGB(232, 186, 248)
-      })  Items["Image"]:AddToTheme({ImageColor3 = "Accent"})
+      })
 
       if IsMobile then 
         Items["FloatingButton"] = Instances:Create("TextButton", {
@@ -5115,7 +5118,7 @@ local Library do
       Window.Items = Items
     end
 
-    UserInputService.MouseIconEnabled = false
+    UserInputService.MouseIconEnabled = true
 
     local Debounce = false
 
@@ -5189,15 +5192,12 @@ local Library do
     Library:Connect(UserInputService.InputBegan, function(Input)
       if tostring(Input.KeyCode) == Library.MenuKeybind or tostring(Input.UserInputType) == Library.MenuKeybind then
         Window.IsOpen = not Window.IsOpen
-        Items["Image"].Instance.Visible = Window.IsOpen
-        UserInputService.MouseIconEnabled = not Window.IsOpen
         Items["MainFrame"].Instance.Visible = Window.IsOpen
       end
     end)
 
     Library.OnMobileToggle = function()
       Window.IsOpen = not Window.IsOpen
-      if Items["Image"] then Items["Image"].Instance.Visible = Window.IsOpen end
       Items["MainFrame"].Instance.Visible = Window.IsOpen
     end
 
