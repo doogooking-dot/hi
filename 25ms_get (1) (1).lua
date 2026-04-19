@@ -6,10 +6,10 @@
    ██║  ██║██║  ██║ ╚████╔╝ ╚██████╔╝██║ ╚████║    ██║  ██║╚██████╔╝██████╔╝
    ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝   ╚═════╝ ╚═╝  ╚═══╝    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
 
-    🔒 Arvyn Hub UI - Private UI
-    © 2026 Arvyn Hub. All Rights Reserved.
+    🔒 roni Hub UI - Private UI
+    © 2026 roni Hub. All Rights Reserved.
 
-    This UI is strictly licensed and owned by Arvyn Hub.
+    This UI is strictly licensed and owned by roni Hub.
     Unauthorized use, redistribution, or modification is prohibited.
 ]]
 
@@ -89,7 +89,7 @@ if getgenv().library and (type(getgenv().library.unload_menu) == "function") the
 	end)
 end
 getgenv().library = {
-	directory = "Arvyn Scripts",
+	directory = "roni Scripts",
 	folders = { "/fonts", "/configs" },
 	flags = {},
 	config_flags = {},
@@ -205,7 +205,7 @@ do
 		"Normal",
 		{
 			Id = "Medium.ttf",
-			Font = game:HttpGet("https://github.com/Code4Zaaa/arvyn/raw/refs/heads/main/assets/Inter_28pt-Medium.ttf"),
+			Font = game:HttpGet("https://github.com/Code4Zaaa/roni/raw/refs/heads/main/assets/Inter_28pt-Medium.ttf"),
 		}
 	)
 	local v125 = Register_Font(
@@ -215,7 +215,7 @@ do
 		{
 			Id = "SemiBold.ttf",
 			Font = game:HttpGet(
-				"https://github.com/Code4Zaaa/arvyn/raw/refs/heads/main/assets/Inter_28pt-SemiBold.ttf"
+				"https://github.com/Code4Zaaa/roni/raw/refs/heads/main/assets/Inter_28pt-SemiBold.ttf"
 			),
 		}
 	)
@@ -2846,7 +2846,7 @@ library.new = function(v341)
 		end
 	end
 	local v342 = {
-		suffix = v341.suffix or v341.Suffix or "arvyn",
+		suffix = v341.suffix or v341.Suffix or "roni",
 		name = v341.name or v341.Name or "hub",
 		game_name = v341.gameInfo or v341.game_info or v341.GameInfo or "Milenium for Counter-Strike: Global Offensive",
 		size = v341.size or v341.Size or v16(0, 640, 0, 480),
@@ -3443,7 +3443,7 @@ library.new = function(v341)
 				BackgroundTransparency = 0,
 				Position = UDim2.new(0, 60, 0, 60),
 				Size = UDim2.new(0, 50, 0, 50),
-				Image = "rbxassetid://97112445498288",
+				Image = v341.logo or v341.Logo or v647 or "rbxassetid://97112445498288",
 				ZIndex = 999,
 			}
 		)
@@ -7189,7 +7189,7 @@ library.init_watermark = function(v521, v522)
 	local v526 = v522:watermark()
 	local v527 = v526:add_block("chart-four-vertical-bars", "0MS")
 	local v528 = v526:add_block("chart-four-vertical-bars", "0MS")
-	local v529 = v526:add_block("globe-simplified", "arvynscripts.cloud")
+	local v529 = v526:add_block("globe-simplified", "roniscripts.cloud")
 	local v530 = 0
 	library:connection(v8.Heartbeat, function()
 		local v972 = tick()
@@ -7340,3 +7340,4 @@ v60.create_notification = function(v537, v538)
 	end)
 end
 return library
+
