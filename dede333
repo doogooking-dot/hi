@@ -500,32 +500,39 @@ function Library:_PreloadAutoConfig()
     if not (isfile and readfile) then return end
     if not isfile(self._autoLoadFile) then return end
     local ok, name = pcall(readfile, self._autoLoadFile)
-    if not ok or not name or name == "" then return end
+    if not ok or not name then return end
+    name = tostring(name):gsub("^%s+", ""):gsub("%s+$", "")
+    if name == "" then return end
     local path = self._configFolderPath .. "/" .. name .. ".json"
     if not isfile(path) then return end
     local ok2, raw = pcall(readfile, path)
     if not ok2 or not raw then return end
     local ok3, data = pcall(function() return hs:JSONDecode(raw) end)
     if not ok3 or type(data) ~= "table" then return end
+    local count = 0
     for id, v in pairs(data) do
         if type(v) == "table" and v._type == "Color3" then
             v = Color3.new(v.R, v.G, v.B)
         elseif type(v) == "table" and v._type == "EnumItem" then
-            local ok4, e = pcall(function() return Enum[v._enum][v._value] end)
+            local ok4, e = pcall(function() return Enum[(v._enum:gsub("^Enum%.", ""))][v._value] end)
             if ok4 then v = e end
         end
         self._preloadValues[id] = v
+        count = count + 1
     end
     self._preloadedFrom = name
     self._currentConfig = name
+    self._preloadCount = count
 end
 
 function Library:GetAutoLoad()
     if not (isfile and readfile) then return nil end
     if not isfile(self._autoLoadFile) then return nil end
     local ok, name = pcall(readfile, self._autoLoadFile)
-    if ok and name and name ~= "" then return name end
-    return nil
+    if not ok or not name then return nil end
+    name = tostring(name):gsub("^%s+", ""):gsub("%s+$", "")
+    if name == "" then return nil end
+    return name
 end
 
 function Library:SetAutoLoad(configName)
@@ -1501,7 +1508,10 @@ function Library:_RegisterConfigElement(id, elementType, getValue, setValue)
     }
     if self._preloadValues and self._preloadValues[id] ~= nil then
         local v = self._preloadValues[id]
-        task.spawn(function() pcall(setValue, v) end)
+        local ok, err = pcall(setValue, v)
+        if not ok then
+            warn("[roniui] preload setValue failed for " .. tostring(id) .. ": " .. tostring(err))
+        end
     end
 end
 
@@ -1527,7 +1537,7 @@ function Library:SaveConfig(configName, silent)
             if typeof(value) == "Color3" then
                 value = {R = value.R, G = value.G, B = value.B, _type = "Color3"}
             elseif typeof(value) == "EnumItem" then
-                value = {_type = "EnumItem", _enum = tostring(value.EnumType), _value = value.Name}
+                value = {_type = "EnumItem", _enum = (tostring(value.EnumType):gsub("^Enum%.", "")), _value = value.Name}
             end
             configData[id] = value
         end
@@ -1568,24 +1578,34 @@ function Library:LoadConfig(configName, silent)
         return false
     end
 
+    local applied, skipped = 0, 0
     for id, value in pairs(data) do
+        if type(value) == "table" and value._type == "Color3" then
+            value = Color3.new(value.R, value.G, value.B)
+        elseif type(value) == "table" and value._type == "EnumItem" then
+            local ok, e = pcall(function() return Enum[(value._enum:gsub("^Enum%.", ""))][value._value] end)
+            if ok then value = e end
+        end
         if self._configElements[id] then
-            if type(value) == "table" and value._type == "Color3" then
-                value = Color3.new(value.R, value.G, value.B)
-            elseif type(value) == "table" and value._type == "EnumItem" then
-                local ok, e = pcall(function() return Enum[value._enum][value._value] end)
-                if ok then value = e end
-            end
-            pcall(function() self._configElements[id].setValue(value) end)
+            local ok, err = pcall(function() self._configElements[id].setValue(value) end)
+            if ok then applied = applied + 1
+            else skipped = skipped + 1; warn("[roniui] load setValue failed for " .. tostring(id) .. ": " .. tostring(err)) end
+        else
+            skipped = skipped + 1
         end
         self._preloadValues[id] = value
     end
 
     self._currentConfig = configName
     if not silent then
-        self:Notify({Title="Config Loaded", Description="Loaded: " .. configName, Duration=2, Icon="rbxassetid://10723356507"})
+        self:Notify({
+            Title = "Config Loaded",
+            Description = string.format("%s (%d applied, %d skipped)", configName, applied, skipped),
+            Duration = 3,
+            Icon = "rbxassetid://10723356507"
+        })
     end
-    return true
+    return true, applied, skipped
 end
 
 function Library:DeleteConfig(configName)
@@ -1686,7 +1706,7 @@ function Library:CreateConfigSection(tab, opts)
     })
 
     tab:CreateButton({
-        Name = "Save & Set Auto-load",
+        Name = "Save",
         Callback = function()
             local ok = self:SaveConfig(state.selected)
             if ok then
@@ -1698,16 +1718,18 @@ function Library:CreateConfigSection(tab, opts)
     })
 
     tab:CreateButton({
-        Name = "Save Only",
-        Callback = function()
-            self:SaveConfig(state.selected)
-            refreshList()
-        end
-    })
-
-    tab:CreateButton({
         Name = "Load Selected",
-        Callback = function() self:LoadConfig(state.selected); refreshStatus() end
+        Callback = function()
+            local ok, applied, skipped = self:LoadConfig(state.selected)
+            if ok and applied == 0 then
+                self:Notify({
+                    Title = "Configs",
+                    Description = "Loaded but 0 values matched any UI element flags. Did you save before any UI was created?",
+                    Duration = 5
+                })
+            end
+            refreshStatus()
+        end
     })
 
     tab:CreateButton({
@@ -2020,6 +2042,20 @@ function Library._CreateTab(section, name, icon)
             registerElement(text, "Divider")
         end
         return Library._CreateDivider(self, text)
+    end
+
+    function tabMethods:CreateImage(config)
+        registerElement(config.Name or "Image", "Image")
+        return Library._CreateImage(self, config)
+    end
+
+    function tabMethods:CreateCode(config)
+        registerElement(config.Name or "Code", "Code")
+        return Library._CreateCode(self, config)
+    end
+
+    function tabMethods:CreateSpace(height)
+        return Library._CreateSpace(self, height)
     end
 
     return tabMethods
@@ -3412,6 +3448,146 @@ function Library._CreateDivider(tab, text)
         Destroy = function()
             frame:Destroy()
         end
+    }
+end
+
+function Library._CreateImage(tab, config)
+    local height  = tonumber(config.Height) or 120
+    local imageId = config.Image or config.ImageId or ""
+    local title   = config.Title or config.Name
+    local scale   = config.ScaleType or Enum.ScaleType.Fit
+    local tint    = config.ImageColor or Color3.new(1, 1, 1)
+
+    local frame = CreateInstance("Frame", {
+        Name = "Image_" .. (title or "img"),
+        BackgroundColor3 = c.Secondary,
+        BackgroundTransparency = 0.4,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 0, height + (title and 24 or 0)),
+        Parent = tab.content
+    })
+    CreateCorner(frame, 5)
+    CreateStroke(frame)
+
+    if title then
+        CreateInstance("TextLabel", {
+            Name = "Title",
+            FontFace = f.SemiBold,
+            Text = title,
+            TextColor3 = c.Text,
+            TextSize = textsize.Normal,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 10, 0, 4),
+            Size = UDim2.new(1, -20, 0, 18),
+            Parent = frame
+        })
+    end
+
+    local image = CreateInstance("ImageLabel", {
+        Name = "Image",
+        Image = imageId,
+        ImageColor3 = tint,
+        ScaleType = scale,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 6, 0, title and 24 or 6),
+        Size = UDim2.new(1, -12, 0, height - (title and 6 or 12)),
+        Parent = frame
+    })
+    CreateCorner(image, 4)
+
+    return {
+        SetImage = function(_, id) image.Image = id end,
+        SetColor = function(_, col) image.ImageColor3 = col end,
+        SetVisible = function(_, v) frame.Visible = v end,
+        Destroy = function() frame:Destroy() end,
+        _instance = image
+    }
+end
+
+function Library._CreateCode(tab, config)
+    local title = config.Title or config.Name
+    local code  = config.Code or config.Text or ""
+    local lines = select(2, code:gsub("\n", "\n")) + 1
+    local height = math.clamp(lines * 16 + 16 + (title and 22 or 0), 60, 360)
+
+    local frame = CreateInstance("Frame", {
+        Name = "Code_" .. (title or "code"),
+        BackgroundColor3 = c.Secondary,
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 0, height),
+        Parent = tab.content
+    })
+    CreateCorner(frame, 5)
+    CreateStroke(frame)
+
+    if title then
+        CreateInstance("TextLabel", {
+            Name = "Title",
+            FontFace = f.SemiBold,
+            Text = title,
+            TextColor3 = c.Text,
+            TextSize = textsize.Small,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 10, 0, 4),
+            Size = UDim2.new(1, -20, 0, 16),
+            Parent = frame
+        })
+    end
+
+    local scroll = CreateInstance("ScrollingFrame", {
+        Name = "Scroll",
+        BackgroundColor3 = Color3.fromRGB(20, 20, 22),
+        BackgroundTransparency = 0.2,
+        BorderSizePixel = 0,
+        ScrollBarThickness = 4,
+        Position = UDim2.new(0, 6, 0, title and 22 or 6),
+        Size = UDim2.new(1, -12, 1, title and -28 or -12),
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.XY,
+        ScrollingDirection = Enum.ScrollingDirection.XY,
+        Parent = frame
+    })
+    CreateCorner(scroll, 4)
+
+    local label = CreateInstance("TextLabel", {
+        Name = "Code",
+        FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json", Enum.FontWeight.Regular),
+        Text = code,
+        TextColor3 = Color3.fromRGB(220, 220, 230),
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 8, 0, 4),
+        Size = UDim2.new(1, -16, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.XY,
+        Parent = scroll
+    })
+
+    return {
+        SetCode = function(_, txt)
+            label.Text = txt or ""
+        end,
+        GetCode = function() return label.Text end,
+        SetVisible = function(_, v) frame.Visible = v end,
+        Destroy = function() frame:Destroy() end
+    }
+end
+
+function Library._CreateSpace(tab, height)
+    local h = tonumber(height) or 8
+    local frame = CreateInstance("Frame", {
+        Name = "Space",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, h),
+        Parent = tab.content
+    })
+    return {
+        SetHeight = function(_, v) frame.Size = UDim2.new(1, 0, 0, tonumber(v) or 8) end,
+        Destroy = function() frame:Destroy() end
     }
 end
 
