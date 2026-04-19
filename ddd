@@ -1,3 +1,6 @@
+
+-- new
+
 if getgenv().Library then 
   getgenv().Library:Unload()
 end
@@ -4898,7 +4901,8 @@ local Library do
         FontFace = Library.Font,
         TextColor3 = FromRGB(255, 255, 255),
         BorderColor3 = FromRGB(0, 0, 0),
-        Text = Window.Name,
+        Text = "",
+        Visible = false,
         AutomaticSize = Enum.AutomaticSize.X,
         Size = UDim2New(0, 0, 0, 15),
         BackgroundTransparency = 1,
@@ -4909,13 +4913,187 @@ local Library do
         BackgroundColor3 = FromRGB(255, 255, 255)
       })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
 
+
+      Items["TitleCard"] = Instances:Create("Frame", {
+        Parent = Items["MainFrame"].Instance,
+        Name = "\0",
+        Position = UDim2New(0, 6, 0, 6),
+        Size = not IsMobile and UDim2New(0, 208, 0, 60) or UDim2New(0, 140, 0, 60),
+        BorderSizePixel = 0,
+        ZIndex = 3,
+        BackgroundColor3 = FromRGB(21, 24, 24)
+      }) Items["TitleCard"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+      Instances:Create("UICorner", {
+        Parent = Items["TitleCard"].Instance,
+        Name = "\0",
+        CornerRadius = UDimNew(0, 7)
+      })
+
+      Instances:Create("UIStroke", {
+        Parent = Items["TitleCard"].Instance,
+        Name = "\0",
+        Color = FromRGB(30, 33, 33),
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+      }):AddToTheme({Color = "Border"})
+
+      Items["LogoBox"] = Instances:Create("Frame", {
+        Parent = Items["TitleCard"].Instance,
+        Name = "\0",
+        AnchorPoint = Vector2New(0, 0.5),
+        Position = UDim2New(0, 10, 0.5, 0),
+        Size = UDim2New(0, 40, 0, 40),
+        BorderSizePixel = 0,
+        ZIndex = 4,
+        BackgroundColor3 = FromRGB(21, 24, 24)
+      }) Items["LogoBox"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+      Instances:Create("UICorner", {
+        Parent = Items["LogoBox"].Instance,
+        Name = "\0",
+        CornerRadius = UDimNew(0, 7)
+      })
+
+      Instances:Create("UIStroke", {
+        Parent = Items["LogoBox"].Instance,
+        Name = "\0",
+        Color = FromRGB(30, 33, 33),
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+      }):AddToTheme({Color = "Border"})
+
+      Items["LogoImg"] = Instances:Create("ImageLabel", {
+        Parent = Items["LogoBox"].Instance,
+        Name = "\0",
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2New(0.5, 0.5),
+        Position = UDim2New(0.5, 0, 0.5, 0),
+        Size = UDim2New(1, -10, 1, -10),
+        ImageColor3 = FromRGB(64, 110, 245),
+        Image = "",
+        ZIndex = 5,
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(0, 0, 0)
+      }) Items["LogoImg"]:AddToTheme({ImageColor3 = "Accent"})
+
+      pcall(function()
+        if isfile and isfile(Library.Folders.Assets .. "/RoniLogo.png") then
+          Items["LogoImg"].Instance.Image = getcustomasset(Library.Folders.Assets .. "/RoniLogo.png")
+        end
+      end)
+
+      Items["LogoTitle"] = Instances:Create("TextLabel", {
+        Parent = Items["TitleCard"].Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        Text = Window.Name,
+        TextColor3 = FromRGB(255, 255, 255),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 14,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 60, 0, 14),
+        Size = UDim2New(1, -64, 0, 15),
+        AutomaticSize = Enum.AutomaticSize.X,
+        BorderSizePixel = 0,
+        ZIndex = 4,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+      }) Items["LogoTitle"]:AddToTheme({TextColor3 = "Text"})
+
+      Items["LogoSub"] = Instances:Create("TextLabel", {
+        Parent = Items["TitleCard"].Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        Text = "Roni Hub",
+        TextColor3 = FromRGB(255, 255, 255),
+        TextTransparency = 0.5,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 13,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 60, 0, 30),
+        Size = UDim2New(1, -64, 0, 15),
+        AutomaticSize = Enum.AutomaticSize.X,
+        BorderSizePixel = 0,
+        ZIndex = 4,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+      })
+
+      Items["FooterCard"] = Instances:Create("Frame", {
+        Parent = Items["MainFrame"].Instance,
+        Name = "\0",
+        AnchorPoint = Vector2New(0, 1),
+        Position = UDim2New(0, 6, 1, -6),
+        Size = not IsMobile and UDim2New(0, 208, 0, 45) or UDim2New(0, 140, 0, 45),
+        BorderSizePixel = 0,
+        ZIndex = 3,
+        BackgroundColor3 = FromRGB(21, 24, 24)
+      }) Items["FooterCard"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+      Instances:Create("UICorner", {
+        Parent = Items["FooterCard"].Instance,
+        Name = "\0",
+        CornerRadius = UDimNew(0, 7)
+      })
+
+      Instances:Create("UIStroke", {
+        Parent = Items["FooterCard"].Instance,
+        Name = "\0",
+        Color = FromRGB(30, 33, 33),
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+      }):AddToTheme({Color = "Border"})
+
+      Items["FooterTop"] = Instances:Create("TextLabel", {
+        Parent = Items["FooterCard"].Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        Text = "discord.gg/fluxmarket",
+        TextColor3 = FromRGB(255, 255, 255),
+        TextTransparency = 0.5,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 12,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 10, 0, 8),
+        Size = UDim2New(1, -16, 0, 15),
+        AutomaticSize = Enum.AutomaticSize.X,
+        BorderSizePixel = 0,
+        ZIndex = 4,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+      })
+
+      Items["FooterBot"] = Instances:Create("TextLabel", {
+        Parent = Items["FooterCard"].Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        Text = "Session duration: 0:00",
+        TextColor3 = FromRGB(255, 255, 255),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 12,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 10, 0, 23),
+        Size = UDim2New(1, -16, 0, 15),
+        AutomaticSize = Enum.AutomaticSize.X,
+        BorderSizePixel = 0,
+        ZIndex = 4,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+      }) Items["FooterBot"]:AddToTheme({TextColor3 = "Text"})
+
+      do
+        local started = tick()
+        task.spawn(function()
+          while Items["FooterBot"] and Items["FooterBot"].Instance and Items["FooterBot"].Instance.Parent do
+            local t = math.floor(tick() - started)
+            local m = math.floor(t / 60)
+            local s = t % 60
+            Items["FooterBot"].Instance.Text = string.format("Session duration: %d:%02d", m, s)
+            task.wait(1)
+          end
+        end)
+      end
+
       Items["Pages"] = Instances:Create("Frame", {
         Parent = Items["MainFrame"].Instance,
         Name = "\0",
-        BorderColor3 = FromRGB(0, 0, 0),
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 0, 0, 30),
-        Size = not IsMobile and UDim2New(0, 224, 1, -30) or UDim2New(0, 150, 1, -30),
+        Position = UDim2New(0, 0, 0, 75),
+        Size = not IsMobile and UDim2New(0, 224, 1, -130) or UDim2New(0, 150, 1, -130),
         ZIndex = 2,
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(255, 255, 255)
@@ -5228,6 +5406,7 @@ local Library do
       Window = self,
 
       Name = Properties.Name or Properties.name or "Page",
+      Icon = Properties.Icon or Properties.icon or nil,
       Columns = Properties.Columns or Properties.columns or 2,
 
       Active = false,
@@ -5280,6 +5459,27 @@ local Library do
         CornerRadius = UDimNew(1, 0)
       })
 
+      local _hasIcon = Page.Icon ~= nil and Page.Icon ~= ""
+      local _textBaseX = _hasIcon and 28 or 4
+      local _textActiveX = _hasIcon and 36 or 12
+
+      if _hasIcon then
+        Items["Icon"] = Instances:Create("ImageLabel", {
+          Parent = Items["Inactive"].Instance,
+          Name = "\0",
+          BackgroundTransparency = 1,
+          AnchorPoint = Vector2New(0, 0.5),
+          Position = UDim2New(0, 8, 0.5, 0),
+          Size = UDim2New(0, 16, 0, 16),
+          ImageColor3 = FromRGB(255, 255, 255),
+          ImageTransparency = 0.4,
+          Image = "rbxassetid://" .. tostring(Page.Icon),
+          ZIndex = 2,
+          BorderSizePixel = 0,
+          BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["Icon"]:AddToTheme({ImageColor3 = "Text"})
+      end
+
       Items["Text"] = Instances:Create("TextLabel", {
         Parent = Items["Inactive"].Instance,
         Name = "\0",
@@ -5292,7 +5492,7 @@ local Library do
         AnchorPoint = Vector2New(0, 0.5),
         BorderSizePixel = 0,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 4, 0.5, 0),
+        Position = UDim2New(0, _textBaseX, 0.5, 0),
         BorderColor3 = FromRGB(0, 0, 0),
         ZIndex = 2,
         TextSize = 14,
@@ -5398,13 +5598,19 @@ local Library do
 
         Items["Liner"]:Tween(nil, {BackgroundTransparency = 0, Size = UDim2New(0, 6, 1, -20)})
         Items["Inactive"]:Tween(nil, {BackgroundTransparency = 0})
-        Items["Text"]:Tween(nil, {TextTransparency = 0, Position = UDim2New(0, 12, 0.5, 0)})
+        Items["Text"]:Tween(nil, {TextTransparency = 0, Position = UDim2New(0, _textActiveX, 0.5, 0)})
+        if Items["Icon"] then
+          Items["Icon"]:Tween(nil, {ImageTransparency = 0, Position = UDim2New(0, 16, 0.5, 0)})
+        end
 
         Library.CurrentPage = Page
       else
         Items["Liner"]:Tween(nil, {BackgroundTransparency = 1, Size = UDim2New(0, 3, 1, -20)})
         Items["Inactive"]:Tween(nil, {BackgroundTransparency = 1})
-        Items["Text"]:Tween(nil, {TextTransparency = 0.4, Position = UDim2New(0, 4, 0.5, 0)})
+        Items["Text"]:Tween(nil, {TextTransparency = 0.4, Position = UDim2New(0, _textBaseX, 0.5, 0)})
+        if Items["Icon"] then
+          Items["Icon"]:Tween(nil, {ImageTransparency = 0.4, Position = UDim2New(0, 8, 0.5, 0)})
+        end
         Items["Page"].Instance.Visible = false
       end
     end
@@ -6990,4 +7196,4 @@ local Library do
   end
 end
 
-return Library
+getgenv().Library = Library
