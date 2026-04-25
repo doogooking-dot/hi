@@ -75,7 +75,7 @@ if getgenv().library and (type(getgenv().library.unload_menu) == "function") the
   end)
 end
 getgenv().library = {
-  directory = "roni Scripts",
+  directory = "SIGIL Scripts",
   folders = { "/fonts", "/configs" },
   flags = {},
   config_flags = {},
@@ -192,7 +192,7 @@ do
     "Normal",
     {
       Id = "Medium.ttf",
-      Font = game:HttpGet("https://github.com/Code4Zaaa/roni/raw/refs/heads/main/assets/Inter_28pt-Medium.ttf"),
+      Font = game:HttpGet("https://cdn.jsdelivr.net/gh/rsms/inter@master/docs/font-files/Inter-Medium.ttf"),
     }
   )
   local v125 = Register_Font(
@@ -202,7 +202,7 @@ do
     {
       Id = "SemiBold.ttf",
       Font = game:HttpGet(
-        "https://github.com/Code4Zaaa/roni/raw/refs/heads/main/assets/Inter_28pt-SemiBold.ttf"
+        "https://cdn.jsdelivr.net/gh/rsms/inter@master/docs/font-files/Inter-SemiBold.ttf"
       ),
     }
   )
@@ -7176,7 +7176,7 @@ library.init_watermark = function(v521, v522)
   local v526 = v522:watermark()
   local v527 = v526:add_block("chart-four-vertical-bars", "0MS")
   local v528 = v526:add_block("chart-four-vertical-bars", "0MS")
-  local v529 = v526:add_block("globe-simplified", "roniscripts.cloud")
+  local v529 = v526:add_block("globe-simplified", "discord.gg/sigilhub")
   local v530 = 0
   library:connection(v8.Heartbeat, function()
     local v972 = tick()
